@@ -133,3 +133,82 @@ const BOTTOM = {
  hr:["Pelvic RT remains the backbone; VCB + chemo did not improve RFS and increased nodal relapse (GOG-249).","Adding chemo in stage I–II gave no significant OS gain in PORTEC-3 (83.8% vs 82.0%).","Cost: much more acute G≥3 toxicity and persistent neuropathy with chemo."],
  adv:["Chemo is key for survival: PORTEC-3 stage III 5-yr OS 78.5% with CRT vs 68.5% RT alone.","RT adds pelvic/vaginal control on top of chemo (GOG-258) but no RFS gain.","Distant relapse dominates (≈20–30%) – the main failure pattern."]
 };
+
+// ===== v2 additions =====
+Object.assign(TRIALS,{
+  P3L: {name:"PORTEC-3 10-yr", ref:"Post et al. Lancet Oncol 2025", doi:"10.1016/S1470-2045(25)00379-1", n:660, fu:"10.1 yr", pop:"High-risk stage I–III; molecular class in 411", arms:"Pelvic RT vs chemoradiotherapy", key:"Benefit durable at 10 yr (OS +7%); clinically relevant gain mainly in p53abn; none apparent in MMRd/POLEmut."},
+  P3M: {name:"PORTEC-3 molecular", ref:"León-Castillo et al. JCO 2020", doi:"10.1200/JCO.20.00549", n:410, fu:"5 yr", pop:"PORTEC-3 patients with molecular classification", arms:"Pelvic RT vs chemoradiotherapy", key:"p53abn: 5-yr RFS 59% vs 36% with CRT regardless of histology; POLEmut ~98–100% either arm."},
+  P2L: {name:"PORTEC-2 10-yr", ref:"Wortman et al. Br J Cancer 2018", doi:"10.1038/s41416-018-0310-8", n:427, fu:"116 mo", pop:"Stage I–IIA high-intermediate risk", arms:"EBRT vs VBT", key:"VBT vaginal control durable; pelvic recurrence higher without EBRT (6.3% vs 0.9%), concentrated in p53abn, L1CAM+ or substantial LVSI."},
+  G258L:{name:"GOG-258 final OS", ref:"Matei et al. Gynecol Oncol (final OS analysis)", doi:"", pm:"GOG-258 final overall survival Matei", n:813, fu:"112 mo", pop:"Stage III–IVA", arms:"Chemoradiotherapy vs chemotherapy", key:"No OS difference (HR 1.05, 0.82–1.34); no subgroup predicted OS benefit from adding RT."},
+  G258M:{name:"GOG-258 molecular", ref:"Clements et al., summarised in Brower et al. Pract Radiat Oncol 2026", doi:"", pm:"GOG-258 molecular classification Clements", n:420, fu:"113 mo", pop:"GOG-258 patients with MMR/p53 IHC (no POLE testing)", arms:"Chemoradiotherapy vs chemotherapy", key:"p53wt/MMRp (≈NSMP): 5-yr RFS 77% vs 60% with added RT; no gain in p53abn or MMRd. Exploratory."},
+  TIMEC:{name:"TIME-C (RTOG 1203)", ref:"Klopp et al. JCO 2018", doi:"", pmid:"29989857", n:278, fu:"End of RT", pop:"Post-op pelvic RT, endometrial and cervix", arms:"4-field 3D RT vs IMRT", key:"IMRT reduced patient-reported bowel and urinary toxicity during RT."},
+  RUBY:{name:"RUBY", ref:"Mirza et al. NEJM 2023", doi:"10.1056/NEJMoa2216334", n:494, fu:"24 mo", pop:"Primary stage III–IV or first recurrent", arms:"Carbo/paclitaxel ± dostarlimab", key:"Large PFS and OS gain in dMMR/MSI-H (PFS HR 0.28); smaller effect in MMRp."}
+});
+TRIALS.G258L.key=TRIALS.G258L.key; // final OS from author manuscript
+OUT.push(
+ {t:"P2L",g:"ir",e:"OS",y:10,arm:"Pelvic EBRT",tx:"ebrt",v:67.6},
+ {t:"P2L",g:"ir",e:"OS",y:10,arm:"Vaginal brachytherapy",tx:"vbt",v:69.5,note:"p=0.72"},
+ {t:"P2L",g:"ir",e:"VR",y:10,arm:"Pelvic EBRT",tx:"ebrt",v:2.4},
+ {t:"P2L",g:"ir",e:"VR",y:10,arm:"Vaginal brachytherapy",tx:"vbt",v:3.4,note:"p=0.55"},
+ {t:"P2L",g:"ir",e:"NODAL",y:10,arm:"Pelvic EBRT",tx:"ebrt",v:0.9,note:"Pelvic recurrence"},
+ {t:"P2L",g:"ir",e:"NODAL",y:10,arm:"Vaginal brachytherapy",tx:"vbt",v:6.3,note:"p=0.004"},
+ {t:"P2L",g:"ir",e:"DM",y:10,arm:"Pelvic EBRT",tx:"ebrt",v:8.9},
+ {t:"P2L",g:"ir",e:"DM",y:10,arm:"Vaginal brachytherapy",tx:"vbt",v:10.4},
+ {t:"P3L",g:"all",e:"OS",y:10,arm:"Pelvic RT",tx:"ebrt",v:67.3,ci:"62.3–72.7",note:"Whole trial"},
+ {t:"P3L",g:"all",e:"OS",y:10,arm:"Chemoradiotherapy",tx:"crt",v:74.4,ci:"69.8–79.4",note:"HR 0.73, p=0.032"},
+ {t:"P3L",g:"all",e:"RFS",y:10,arm:"Pelvic RT",tx:"ebrt",v:67.4,note:"Whole trial"},
+ {t:"P3L",g:"all",e:"RFS",y:10,arm:"Chemoradiotherapy",tx:"crt",v:72.8,note:"HR 0.74"},
+ {t:"RUBY",g:"adv",e:"OS",y:2,arm:"Chemo + placebo",tx:"ct",v:56.0,note:"All-comers, incl. recurrent"},
+ {t:"RUBY",g:"adv",e:"OS",y:2,arm:"Chemo + dostarlimab",tx:"io",v:71.3,note:"HR 0.64"},
+ {t:"RUBY",g:"adv",e:"RFS",y:2,arm:"Chemo + placebo",tx:"ct",v:18.1,note:"Progression-free survival"},
+ {t:"RUBY",g:"adv",e:"RFS",y:2,arm:"Chemo + dostarlimab",tx:"io",v:36.1,note:"HR 0.64"}
+);
+LC.push(
+ {g:"ir",t:"P2L",cmp:"EBRT vs VBT",end:"Pelvic recurrence",y:10,ctrl:6.3,tx:0.9,rand:true,caveat:"Gain concentrated in p53abn / L1CAM+ / substantial LVSI"},
+ {g:"adv",t:"G258M",cmp:"Adding RT to chemo – p53wt/MMRp (≈NSMP)",end:"Any recurrence or death (1 − RFS)",y:5,ctrl:40,tx:23,rand:true,caveat:"Exploratory molecular subgroup"}
+);
+TOX.push(
+ {t:"TIMEC",g:"ir",cat:"Patient-reported diarrhoea (frequent/constant)",gr:"PRO",ph:"End of RT",a:[["3D 4-field",51.9],["IMRT",33.7]],note:"Antidiarrhoeal ≥4×/day: 20.4% vs 7.8%"},
+ {t:"TIMEC",g:"hr",cat:"Patient-reported diarrhoea (frequent/constant)",gr:"PRO",ph:"End of RT",a:[["3D 4-field",51.9],["IMRT",33.7]]},
+ {t:"TIMEC",g:"adv",cat:"Patient-reported diarrhoea (frequent/constant)",gr:"PRO",ph:"End of RT",a:[["3D 4-field",51.9],["IMRT",33.7]]}
+);
+BOTTOM.adv.push("GOG-258 final analysis: no OS difference with added RT (HR 1.05); molecular data suggest RT helps p53wt/NSMP (RFS 77% vs 60%).","dMMR stage III–IV: chemo + immunotherapy (RUBY 2-yr OS 83% vs 59% in dMMR).");
+BOTTOM.ir.push("PORTEC-2 10-yr: VBT vaginal control holds (3.4% vs 2.4%); pelvic relapse 6.3% vs 0.9% – consider EBRT for p53abn / substantial LVSI.");
+BOTTOM.hr.push("PORTEC-3 10-yr: OS 74.4% vs 67.3% with CRT – benefit chiefly in p53abn.");
+
+// Molecular subgroup outcomes: chemo/RT benefit by class
+const MOL = [
+ {cls:"p53abn",t:"P3L",e:"10-yr OS",ctrlL:"RT",ctrl:36.6,txL:"CRT",tx:52.7,hr:"HR 0.52 (0.30–0.91)",sig:true},
+ {cls:"p53abn",t:"P3L",e:"10-yr RFS",ctrlL:"RT",ctrl:37.0,txL:"CRT",tx:52.6,hr:"HR 0.42 (0.24–0.74)",sig:true},
+ {cls:"p53abn",t:"P3M",e:"5-yr RFS",ctrlL:"RT",ctrl:36,txL:"CRT",tx:59,hr:"p=0.019",sig:true},
+ {cls:"p53abn",t:"G258M",e:"5-yr RFS",ctrlL:"Chemo",ctrl:29,txL:"Chemo + RT",tx:29,hr:"HR 0.76 (0.46–1.24)"},
+ {cls:"POLEmut",t:"P3L",e:"10-yr OS",ctrlL:"RT",ctrl:96.4,txL:"CRT",tx:100,hr:"p=0.40"},
+ {cls:"POLEmut",t:"P3M",e:"5-yr RFS",ctrlL:"RT",ctrl:97,txL:"CRT",tx:100,hr:"p=0.64"},
+ {cls:"POLEmut",t:"P4a",e:"5-yr vaginal recurrence*",ctrlL:"VBT",ctrl:0.9,txL:"Observation",tx:4.1,hr:"Favourable profile incl. NSMP-CTNNB1wt",lower:true},
+ {cls:"MMRd",t:"P3L",e:"10-yr OS",ctrlL:"RT",ctrl:74.4,txL:"CRT",tx:68.7,hr:"HR 1.34 (0.71–2.55)"},
+ {cls:"MMRd",t:"P3L",e:"10-yr RFS",ctrlL:"RT",ctrl:76.4,txL:"CRT",tx:72.9,hr:"HR 1.13 (0.59–2.15)"},
+ {cls:"MMRd",t:"G258M",e:"5-yr RFS",ctrlL:"Chemo",ctrl:64,txL:"Chemo + RT",tx:53,hr:"HR 1.34 (0.70–2.56)"},
+ {cls:"MMRd",t:"RUBY",e:"2-yr OS (stage III–IV / recurrent)",ctrlL:"Chemo",ctrl:58.7,txL:"Chemo + dostarlimab",tx:83.3,hr:"HR 0.30 (0.13–0.70)",sig:true},
+ {cls:"MMRd",t:"RUBY",e:"2-yr PFS (stage III–IV / recurrent)",ctrlL:"Chemo",ctrl:15.7,txL:"Chemo + dostarlimab",tx:61.4,hr:"HR 0.28 (0.16–0.50)",sig:true},
+ {cls:"NSMP",t:"P3L",e:"10-yr OS",ctrlL:"RT",ctrl:74.1,txL:"CRT",tx:81.2,hr:"HR 0.60 (0.27–1.32)"},
+ {cls:"NSMP",t:"P3L",e:"10-yr RFS",ctrlL:"RT",ctrl:61.7,txL:"CRT",tx:72.8,hr:"HR 0.61 (0.33–1.15); modulated by ER status"},
+ {cls:"NSMP",t:"G258M",e:"5-yr RFS (p53wt/MMRp)",ctrlL:"Chemo",ctrl:60,txL:"Chemo + RT",tx:77,hr:"HR 0.54 (0.32–0.94)",sig:true},
+ {cls:"MMRp",t:"RUBY",e:"2-yr OS (MMRp/MSS)",ctrlL:"Chemo",ctrl:55.1,txL:"Chemo + dostarlimab",tx:67.7,hr:"HR 0.73 (0.52–1.02)"}
+];
+const MOLPROG = {t:"P3L",label:"10-yr RFS by class, PORTEC-3 (both arms)",v:[["POLEmut",98.0],["MMRd",74.7],["NSMP",67.8],["p53abn",45.3]]};
+const MOLNOTE = {
+ POLEmut:"Excellent prognosis regardless of adjuvant therapy; de-escalation supported (PORTEC-4a, ESGO).",
+ MMRd:"No benefit from adding chemo to RT or RT to chemo in adjuvant trials; immunotherapy benefit in advanced/recurrent disease.",
+ NSMP:"Intermediate prognosis; RT appears important in stage III (GOG-258 p53wt). ER status modifies chemo benefit.",
+ p53abn:"Worst prognosis; clear benefit from chemoradiotherapy (PORTEC-3). Adding RT to chemo alone did not help in GOG-258.",
+ MMRp:"Mismatch-repair proficient (POLEmut, NSMP, p53abn combined)."
+};
+
+// ESGO-ESTRO-ESP 2025 molecular risk groups (FIGO 2023 'm' staging)
+const ESGO = [
+ {risk:"Low",col:"#3c8d4f",who:["Stage IAm POLEmut, MMRd, or NSMP low-grade ER+","Stage IBm POLEmut","Stage ICm POLEmut or MMRd","Stage IIm POLEmut"],rx:["No adjuvant therapy (I, A)"]},
+ {risk:"Intermediate",col:"#d4b02a",who:["Stage IBm MMRd or NSMP low-grade ER+","Stage IIAm NSMP low-grade ER+","Stage IICm MMRd, myoinvasive, no cervical stromal invasion, no substantial LVSI"],rx:["Vaginal brachytherapy (I, A)","No adjuvant therapy is an option (III, C), esp. <60 yr or low grade"]},
+ {risk:"High–intermediate",col:"#d47a2a",who:["Stage IIAm MMRd","Stage IIBm MMRd or NSMP low-grade ER+","Stage IICm MMRd with cervical invasion or substantial LVSI"],rx:["EBRT for optimal pelvic control (II, A)","VBT alternative, esp. if pN0 (II, B)","No adjuvant therapy can be considered if pN0, no substantial LVSI, low grade (IV, B)"]},
+ {risk:"High",col:"#c0392b",who:["Stage IA2m–IBm NSMP high-grade/ER− or p53abn","Stage IIm NSMP high-grade/ER− or p53abn","Stage IIIm–IVAm (all non-POLEmut classes)"],rx:["EBRT + chemotherapy: concurrent + adjuvant (I, A) or sequential (I, B)","Chemotherapy ± VBT (I, B)","Stage IIIm–IVAm MMRd: chemo + immune checkpoint inhibitor ± EBRT (II, B)"]}
+];
+const ESGOREF={name:"ESGO–ESTRO–ESP 2025",ref:"Concin et al. Lancet Oncol 2025 (update 2025)",url:"https://pubmed.ncbi.nlm.nih.gov/?term=ESGO+ESTRO+ESP+guidelines+endometrial+carcinoma+update+2025"};

@@ -3,7 +3,7 @@
 <title>Endometrial Cancer · Adjuvant Evidence</title>
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--ink:#1c2430;--mute:#5d6878;--line:#e3e7ec;--acc:#1f5f8b;
---none:#9aa5b1;--ebrt:#1f5f8b;--vbt:#2a9d8f;--crt:#c0582f;--ct:#8e6bbf;--vbtct:#d49a2a;--mol:#3c8d4f}
+--none:#9aa5b1;--ebrt:#1f5f8b;--vbt:#2a9d8f;--crt:#c0582f;--ct:#8e6bbf;--vbtct:#d49a2a;--mol:#3c8d4f;--io:#b03a7a}
 @media (prefers-color-scheme:dark){:root{--bg:#12161c;--card:#1a2029;--ink:#e6eaef;--mute:#9aa6b4;--line:#2b333f;--acc:#6fb3e0;--ebrt:#4f95c8;--none:#6c7682}}
 *{box-sizing:border-box}body{margin:0;font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
 header{padding:20px 24px 8px;max-width:1150px;margin:auto}h1{font-size:22px;margin:0}header p{margin:4px 0 0;color:var(--mute);font-size:13px}
@@ -38,11 +38,11 @@ footer{color:var(--mute);font-size:12px;max-width:1150px;margin:auto;padding:0 2
 <footer>Figures are author-reported point estimates from each trial; populations, eras, staging (FIGO 1988/2009) and endpoint definitions differ, so cross-trial comparison is indicative only. "Typical range" = span of arm-level estimates across the listed trials, not a meta-analysis.</footer>
 <script src="data.js"></script>
 <script>
-const TXC={none:"var(--none)",ebrt:"var(--ebrt)",vbt:"var(--vbt)",crt:"var(--crt)",ct:"var(--ct)",vbtct:"var(--vbtct)",mol:"var(--mol)"};
-const TXL={none:"No adjuvant",ebrt:"Pelvic EBRT",vbt:"Vaginal brachy",crt:"Chemoradiotherapy",ct:"Chemo alone",vbtct:"VCB + chemo",mol:"Molecular-guided"};
+const TXC={none:"var(--none)",ebrt:"var(--ebrt)",vbt:"var(--vbt)",crt:"var(--crt)",ct:"var(--ct)",vbtct:"var(--vbtct)",mol:"var(--mol)",io:"var(--io)"};
+const TXL={none:"No adjuvant",ebrt:"Pelvic EBRT",vbt:"Vaginal brachy",crt:"Chemoradiotherapy",ct:"Chemo alone",vbtct:"VCB + chemo",mol:"Molecular-guided",io:"Chemo + immunotherapy"};
 const EL={OS:"Overall survival",RFS:"Recurrence/failure-free survival",VR:"Vaginal recurrence",LRR:"Locoregional recurrence",NODAL:"Pelvic/para-aortic nodal recurrence",DM:"Distant metastasis",ANYREC:"Any recurrence"};
 let G="ir",T="ov";
-const link=t=>{const x=TRIALS[t];return x.doi?`https://doi.org/${x.doi}`:`https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(x.pm)}`};
+const link=t=>{const x=TRIALS[t];if(x.pmid)return `https://pubmed.ncbi.nlm.nih.gov/${x.pmid}/`;return x.doi?`https://doi.org/${x.doi}`:`https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(x.pm)}`};
 const tl=t=>`<a href="${link(t)}" target="_blank" rel="noopener">${TRIALS[t].name}</a>`;
 const inG=r=>r.g===G||(r.g==="all"&&G!=="ir");
 function bars(rows,max=100){return rows.map(r=>`<div class="row"><div>${r.arm}${r.note?`<div class="sub">${r.note}</div>`:""}</div>
@@ -75,11 +75,20 @@ function toxView(){const rs=TOX.filter(inG);
  ${r.a.map(([arm,v])=>`<div class="row"><div>${arm}</div><div class="track"><div class="fill" style="width:${Math.max(v/mx*100,1)}%;background:var(--crt)"></div></div><div class="val">${v}%</div></div>`).join("")}${r.note?`<div class="note">${r.note}</div>`:""}</div>`}).join("")}</div>`}
 function survView(){return `${legend()}<h2>Overall survival</h2><div class="grid">${byTrial("OS")}</div><h2>Recurrence / failure-free survival</h2><div class="grid">${byTrial("RFS")||'<div class="card sub">Not reported for this group.</div>'}</div>`}
 function trials(){return `<div class="card" style="overflow-x:auto"><table><tr><th>Trial</th><th>Population</th><th>Arms</th><th>N / FU</th><th>Take-home</th></tr>${Object.keys(TRIALS).map(k=>{const x=TRIALS[k];return `<tr><td><b>${tl(k)}</b><div class="sub">${x.ref}</div></td><td>${x.pop}</td><td>${x.arms}</td><td>${x.n}<div class="sub">${x.fu}</div></td><td>${x.key}</td></tr>`}).join("")}</table></div>`}
-const TABS={ov:["Overview",overview],sv:["Survival",survView],lc:["Local control",lcView],tx:["Toxicity",toxView],tr:["Trials",trials]};
+function molView(){const cls=["POLEmut","MMRd","NSMP","p53abn","MMRp"];
+ return `<div class="card"><h3>Prognosis by molecular class <span class="tag">${tl(MOLPROG.t)}</span></h3><div class="sub">${MOLPROG.label}</div>${MOLPROG.v.map(([c,v])=>`<div class="row"><div>${c}</div><div class="track"><div class="fill" style="width:${v}%;background:var(--acc)"></div></div><div class="val">${v}%</div></div>`).join("")}</div>
+ <p class="sub">Effect of intensifying treatment within each class (survival; *recurrence where marked). Green ARR = benefit. Molecular analyses are post-hoc / exploratory unless stated.</p>
+ ${cls.map(c=>{const rs=MOL.filter(m=>m.cls===c);if(!rs.length)return"";return `<h2>${c}</h2><div class="sub" style="margin:-4px 0 10px">${MOLNOTE[c]}</div><div class="grid">${rs.map(r=>{const d=+(r.lower?r.ctrl-r.tx:r.tx-r.ctrl).toFixed(1);const mx=r.lower?Math.max(10,r.ctrl,r.tx):100;
+ return `<div class="card"><h3>${r.e}</h3><div class="sub">${tl(r.t)} · ${r.hr}${r.sig?' <span class="tag" style="background:#2e8b57;color:#fff">significant</span>':""}</div>
+ ${bars([{arm:r.ctrlL,v:r.ctrl,tx:"none"},{arm:r.txL,v:r.tx,tx:"crt"}],mx)}
+ <div style="margin-top:6px">${(()=>{const df=+(r.tx-r.ctrl).toFixed(1);const good=r.lower?df<0:df>0;return `${r.lower?"Change in recurrence":"Absolute difference"} <span class="ben ${df===0?"":good?"pos":"neg"}">${df>0?"+":""}${df}%</span>`})()}</div></div>`}).join("")}</div>`}).join("")}`}
+function esgoView(){return `<p class="sub">Molecular-integrated risk groups and adjuvant recommendations from <a href="${ESGOREF.url}" target="_blank" rel="noopener">${ESGOREF.ref}</a>. Level of evidence / grade in brackets. Summary only – check the full guideline.</p><div class="grid">${ESGO.map(g=>`<div class="card" style="border-top:4px solid ${g.col}"><h3>${g.risk} risk</h3><div class="sub" style="margin-top:6px">Includes</div><ul class="k">${g.who.map(x=>`<li>${x}</li>`).join("")}</ul><div class="sub" style="margin-top:10px">Recommended adjuvant</div><ul class="k">${g.rx.map(x=>`<li><b>${x}</b></li>`).join("")}</ul></div>`).join("")}</div>
+ <div class="note" style="margin-top:12px">POLEmut stage I–II: low risk regardless of other features.</div>`}
+const TABS={ov:["Overview",overview],sv:["Survival",survView],lc:["Local control",lcView],tx:["Toxicity",toxView],mo:["Molecular",molView],gl:["ESGO 2025",esgoView],tr:["Trials",trials]};
 function seg(id,items,cur,fn){document.getElementById(id).innerHTML=items.map(([k,l])=>`<button class="${k===cur?"on":""}" data-k="${k}">${l}</button>`).join("");
  document.querySelectorAll(`#${id} button`).forEach(b=>b.onclick=()=>fn(b.dataset.k))}
 function render(){seg("grp",Object.entries(GROUPS).map(([k,v])=>[k,v.short]),G,k=>{G=k;render()});
  seg("tab",Object.entries(TABS).map(([k,v])=>[k,v[0]]),T,k=>{T=k;render()});
- document.getElementById("m").innerHTML=(T!=="tr"?`<div class="sub" style="margin-bottom:12px"><b>${GROUPS[G].label}</b></div>`:"")+TABS[T][1]();}
+ document.getElementById("m").innerHTML=(!["tr","mo","gl"].includes(T)?`<div class="sub" style="margin-bottom:12px"><b>${GROUPS[G].label}</b></div>`:"")+TABS[T][1]();}
 render();
 </script></body></html>
