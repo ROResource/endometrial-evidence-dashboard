@@ -212,3 +212,30 @@ const ESGO = [
  {risk:"High",col:"#c0392b",who:["Stage IA2m–IBm NSMP high-grade/ER− or p53abn","Stage IIm NSMP high-grade/ER− or p53abn","Stage IIIm–IVAm (all non-POLEmut classes)"],rx:["EBRT + chemotherapy: concurrent + adjuvant (I, A) or sequential (I, B)","Chemotherapy ± VBT (I, B)","Stage IIIm–IVAm MMRd: chemo + immune checkpoint inhibitor ± EBRT (II, B)"]}
 ];
 const ESGOREF={name:"ESGO–ESTRO–ESP 2025",ref:"Concin et al. Lancet Oncol 2025 (update 2025)",url:"https://pubmed.ncbi.nlm.nih.gov/?term=ESGO+ESTRO+ESP+guidelines+endometrial+carcinoma+update+2025"};
+
+// ===== v3 additions =====
+Object.assign(TRIALS,{
+  P12M:{name:"PORTEC-1/2 molecular", ref:"Horeweg et al. JCO 2023", doi:"10.1200/JCO.23.00062", n:880, fu:"Long-term", pop:"Stage I–II intermediate/HIR (PORTEC-1 + PORTEC-2 tumours)", arms:"No RT vs VBT vs EBRT", key:"RT benefit for locoregional control in NSMP and p53abn (EBRT); no benefit in POLEmut (no recurrences) or MMRd."},
+  KB21:{name:"KEYNOTE-B21", ref:"Van Gorp et al. Ann Oncol 2024", doi:"10.1016/j.annonc.2024.08.2242", pmid:"39284383", n:1095, fu:"Interim", pop:"Newly diagnosed high-risk (adjuvant), all-comers", arms:"Adjuvant chemo ± RT, plus pembrolizumab vs placebo", key:"No DFS benefit overall (HR 1.02); dMMR HR 0.31, pMMR HR 1.20. Grade ≥3 AE 71% vs 63%."},
+  GY18:{name:"NRG-GY018", ref:"Eskander et al. NEJM 2023", doi:"10.1056/NEJMoa2302312", n:816, fu:"12 mo", pop:"Stage III–IVA measurable, IVB or recurrent", arms:"Carbo/paclitaxel ± pembrolizumab", key:"dMMR 12-mo PFS 74% vs 38% (HR 0.30); pMMR median PFS 13.1 vs 8.7 mo (HR 0.54)."},
+  P3Q:{name:"PORTEC-3 QoL/toxicity", ref:"de Boer et al. Lancet Oncol 2016; Post et al. IJROBP 2021", doi:"10.1016/S1470-2045(16)30120-6", n:660, fu:"5 yr", pop:"High-risk", arms:"RT vs chemoradiotherapy", key:"Persistent patient-reported tingling/numbness (24% vs 9% at 5 yr); physical/role function lower up to 3 yr; global QoL similar long-term."},
+  P2Q:{name:"PORTEC-2 QoL", ref:"de Boer/Nout et al. Eur J Cancer 2012 (5-yr HRQL)", doi:"10.1016/j.ejca.2011.11.014", n:348, fu:"65 mo", pop:"HIR stage I–IIA", arms:"EBRT vs VBT", key:"EBRT: clinically relevant higher bowel symptoms (diarrhoea, faecal leakage, toilet proximity) and lower social functioning at 5 yr; VBT QoL ≈ norm population. Sexual symptoms worse than norm in both arms."}
+});
+TRIALS.KB21.doi=""; // use PubMed link
+MOL.push(
+ {cls:"NSMP",t:"P12M",e:"5-yr locoregional RFS (early stage)",ctrlL:"No RT",ctrl:87.7,txL:"EBRT",tx:98.3,hr:"p<0.001 (VBT 96.2%)",sig:true},
+ {cls:"p53abn",t:"P12M",e:"5-yr locoregional RFS (early stage)",ctrlL:"No RT",ctrl:72.2,txL:"EBRT",tx:96.9,hr:"p=0.048 across arms; VBT 64.3%",sig:true},
+ {cls:"MMRd",t:"P12M",e:"5-yr locoregional RFS (early stage)",ctrlL:"No RT",ctrl:90.3,txL:"EBRT",tx:94.2,hr:"p=0.74 (VBT 94.2%)"},
+ {cls:"MMRd",t:"GY18",e:"12-mo PFS (advanced / recurrent)",ctrlL:"Chemo",ctrl:38,txL:"Chemo + pembrolizumab",tx:74,hr:"HR 0.30 (0.19–0.48)",sig:true},
+ {cls:"MMRd",t:"KB21",e:"Adjuvant DFS – dMMR subgroup",ctrlL:"Chemo ± RT",ctrl:null,txL:"+ pembrolizumab",tx:null,hr:"HR 0.31 (0.14–0.69); pMMR HR 1.20",sig:true,hrOnly:true}
+);
+MOLNOTE.POLEmut+=" PORTEC-1/2: no locoregional recurrences in POLEmut regardless of RT.";
+TOX.push(
+ {t:"P3Q",g:"hr",cat:"Patient-reported tingling/numbness (quite a bit/very much)",gr:"PRO",ph:"5 yr",a:[["Pelvic RT",9],["Chemoradiotherapy",24]]},
+ {t:"P3Q",g:"hr",cat:"Patient-reported limb weakness",gr:"PRO",ph:"Up to 3 yr",a:[["Pelvic RT",5],["Chemoradiotherapy",21]]},
+ {t:"P3Q",g:"hr",cat:"Any adverse event",gr:"G≥2",ph:"During treatment",a:[["Pelvic RT",44],["Chemoradiotherapy",94]]},
+ {t:"KB21",g:"hr",cat:"Any adverse event",gr:"G≥3",ph:"Adjuvant",a:[["Chemo ± RT + placebo",63],["+ pembrolizumab",71]]}
+);
+TOX.filter(x=>x.t==="P3Q").forEach(x=>TOX.push({...x,g:"adv"}));
+BOTTOM.ir.push("PORTEC-1/2 molecular: EBRT benefit concentrated in p53abn and NSMP; none in POLEmut/MMRd. EBRT bowel symptoms persist at 5 yr vs VBT (PORTEC-2 QoL).");
+BOTTOM.hr.push("KEYNOTE-B21: adjuvant pembrolizumab did not improve DFS overall; signal only in dMMR (HR 0.31).");
